@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Shook Clicker</title>
+        <script src="https://cdn.jsdelivr.net/npm/phaser-ce@2.9.1/build/phaser.js"></script>
+    </head>
+    <body>
+
+    <script type="text/javascript">
+      var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+      var clicker;
+      var clicks = 0;
+      var scoreText;
+      function preload()
+      {
+        game.load.image('clicker', 'assets/cookie.png');
+
+      }
+
+      function create()
+      {
+      clicker = game.add.sprite(0,0, 'clicker' );
+      clicker.scale.setTo(.09,.09);
+      clicker.inputEnable = true;
+      //game.input.mouse.capture = true;
+      scoreText = game.add.text(16,16, "Computers Built: 0", {fontSize:"32px", fill: '#000'});
+      }
+
+      function update()
+      {
+        if(clicker.input.pointerOver())
+        {
+          clicks++;
+          scoreText.text = "Computers Built: " + clicks;
+        }
+      }
+
+  </script>
+  </body>
+</html>
