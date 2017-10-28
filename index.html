@@ -8,78 +8,106 @@
     <body>
 
     <script type="text/javascript">
-      var game = new Phaser.Game(1920, 1080, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
+      var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
       var clicks = 0;
+      var clickValue = 1;
       var cps = 0;
       var scoreText;
       var scorePerSec;
-
+      //particle emitter
+      var emitter;
+      //student labor
       var priceStudents = 50;
       var studentsOwned = 0;
+      //bitcoins
+      var coinsOwned = 0;
+      var priceCoins = 25;
+
+
       function preload()
       {
-        game.load.image('bgImg', 'assets/shookClickerBG.png')
+        //game.load.image('bgImg', 'assets/shookClickerBG.png')
         game.load.image('clicker', 'assets/cookie.png');
         game.load.image('mouse', 'assets/mouse.jpg');
+        game.load.image('bitcoin', 'assets/bitcoin.png');
 
       }
-
       function create()
       {
+        var shopGroup = game.add.group();
         //create sprites
-      var bgImg = game.add.sprite(0,0, 'bgImg');
+        //particle emitter
+        emitter = game.add.emitter(0,0,100);
+        emitter.makeParticles('bitcoin');
 
+    //  var bgImg = game.add.sprite(0,0, 'bgImg');
       var clicker = game.add.sprite(game.world.centerX,game.world.centerY, 'clicker' );
-      var mouse = game.add.sprite(game.world.centerX + 70, game.world.centerY + 20, 'mouse' );
-
+    //  var mouse = game.add.sprite(game.world.centerX + 70, game.world.centerY + 20, 'mouse' );
+      shopGroup.create(game.world.centerX + 70, game.world.centerY + 20, 'mouse');
+      shopGroup.create(game.world.centerX + 70, game.world.centerY -100, 'bitcoin');
       //shop prop
-      mouse.scale.setTo(.3, .3);
+      shopGroup.children[0].scale.setTo(.3, .3);
+      shopGroup.children[1].scale.setTo(.3, .3);
       //clicker prop
       clicker.anchor.set(0.5);
       clicker.scale.setTo(.09,.09);
       clicker.inputEnabled = true;
-      mouse.inputEnabled = true;
+      shopGroup.children[0].inputEnabled = true;
+      shopGroup.children[1].inputEnabled = true;
       //game.input.mouse.capture = true;
       scoreText = game.add.text(16,16, "Computers Built: 0", {fontSize:"32px", fill: '#555'});
       scorePerSec = game.add.text(16, 60, "Computers Per Second: 0", {fontSize: "16px", fill: '#555'});
-
       //click listeners
-      mouse.events.onInputDown.add(shop, this);
+      shopGroup.children[0].events.onInputDown.add(shop, this);
+      shopGroup.children[1].events.onInputDown.add(shop, this);
       clicker.events.onInputDown.add(listener, this);
       //1 second loop event
       game.time.events.loop(Phaser.Timer.SECOND, updateLooper, this);
       }
-
       function update()
       {
-
         scoreText.text = "Computers Built: " + clicks;
         scorePerSec.text = "Computers Per Second: " + cps;
-
       }
       //run every second
       function updateLooper()
       {
         clicks += cps;
       }
-      function listener()
+      function listener(pointer)
       {
-        clicks++;
+        clicks += clickValue;
 
+        emitter.x = pointer.x;
+        emitter.y = pointer.y;
+        //(explode, lifespan ms, ignore when using explode, # to emit)
+        emitter.start(true, 300, null, 5);
       }
-      function shop(sprite, button)
+      function shop(sprite)
       {
-        if(clicks >= priceStudents)
-        {
-          clicks -= 50;
-          cps += 2;
-          studentsOwned++;
-          priceStudents += studentsOwned*.5;
 
+        if(sprite.key == 'mouse')
+        {
+          if(clicks >= priceStudents)
+          {
+            clicks -= priceStudents;
+            cps += 1;
+            studentsOwned++;
+            priceStudents += studentsOwned*.25;
+          }
+        }
+        else if(sprite.key == 'bitcoin')
+        {
+          if(clicks >= priceCoins)
+          {
+            clicks -= priceCoins;
+            clickValue += 1;
+            coinsOwned++;
+            priceCoins += coinsOwned*.5;
+          }
         }
       }
-
   </script>
   </body>
 </html>
